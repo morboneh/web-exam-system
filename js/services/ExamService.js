@@ -1,29 +1,27 @@
 import { Exam } from "../models/Exam.js";
 import { Question } from "../models/Question.js";
+import { StorageService } from "./StorageService.js";
 
 export class ExamService {
   constructor() {
-    this.storageKey = "exams";
+    this.storageService = new StorageService();
   }
 
   getAllExams() {
-    // Get data from localStorage by exams key
-    const data = localStorage.getItem(this.storageKey);
-
-    if (!data) {
-      return [];
-    }
-    
-    // continue if key exists and parse data to array of objects
-    const plainExams = JSON.parse(data);
+    const plainExams = this.storageService.getExams();
 
     // for each examData(Exam) return new Exam object with the same data
     // simply putting - creates a clone of each exam
     let allExamClones = plainExams.map(examData => {
-      const exam = new Exam(examData.title);
-
-      exam.id = examData.id;
-      exam.createdAt = examData.createdAt;
+      const exam = new Exam(examData.title, {
+        id: examData.id,
+        description: examData.description,
+        category: examData.category,
+        code: examData.code,
+        duration: examData.duration,
+        teacherId: examData.teacherId,
+        createdAt: examData.createdAt
+      });
 
       // inner clone for all the exam's questions
       exam.questions = examData.questions.map(questionData => {
@@ -52,7 +50,7 @@ export class ExamService {
 
     exams.push(exam);
 
-    localStorage.setItem(this.storageKey, JSON.stringify(exams));
+    this.storageService.saveExams(exams);
   }
 
   deleteExam(examId) {
@@ -60,7 +58,7 @@ export class ExamService {
 
     const filteredExams = exams.filter(exam => exam.id !== examId);
 
-    localStorage.setItem(this.storageKey, JSON.stringify(filteredExams));
+    this.storageService.saveExams(filteredExams);
   }
 
   getExamById(examId) {
@@ -70,6 +68,6 @@ export class ExamService {
   }
 
   clearAllExams() {
-    localStorage.removeItem(this.storageKey);
+    this.storageService.saveExams([]);
   }
 }
