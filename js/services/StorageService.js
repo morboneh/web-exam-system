@@ -31,6 +31,29 @@ export class StorageService {
     this.saveJson(this.keys.users, users);
   }
 
+  addUser(user) {
+    const users = this.getUsers();
+
+    users.push(user);
+    this.saveUsers(users);
+  }
+
+  findUserByEmail(email) {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    return this.getUsers().find(user => user.email?.toLowerCase() === normalizedEmail);
+  }
+
+  findUserByCredentials(email, password) {
+    const user = this.findUserByEmail(email);
+
+    if (!user || user.password !== password) {
+      return null;
+    }
+
+    return user;
+  }
+
   getExams() {
     return this.getJson(this.keys.exams, []);
   }

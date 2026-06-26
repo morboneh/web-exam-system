@@ -32,3 +32,28 @@ body {
   font-size: 0.9rem;
   color: #666;
 }
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.auth-card {
+  max-width: 420px;
+  width: 100%;
+}
+
+.form-message {
+  min-height: 22px;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.form-message.success {
+  color: #146c43;
+}
+
+.form-message.error {
+  color: #b02a37;
+}
