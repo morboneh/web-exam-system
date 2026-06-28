@@ -57,3 +57,39 @@ body {
 .form-message.error {
   color: #b02a37;
 }
+
+.home-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.home-brand {
+  color: #212529;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.home-main {
+  min-height: calc(100vh - 73px);
+  display: flex;
+  align-items: center;
+}
+
+.home-details dt {
+  color: #6c757d;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.home-details dd {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .home-brand {
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
+}
