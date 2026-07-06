@@ -1,10 +1,18 @@
 import { User } from "../models/User.js";
+import { AuthService } from "../services/AuthService.js";
 import { StorageService } from "../services/StorageService.js";
 
+const authService = new AuthService();
 const storageService = new StorageService();
 
 const registerForm = document.getElementById("registerForm");
 const messageElement = document.getElementById("registerMessage");
+
+const currentUser = authService.getCurrentUser();
+
+if (currentUser) {
+  authService.redirectByRole(currentUser);
+}
 
 registerForm.addEventListener("submit", event => {
   event.preventDefault();

@@ -1,10 +1,15 @@
-import { User } from "../models/User.js";
-import { StorageService } from "../services/StorageService.js";
+import { AuthService } from "../services/AuthService.js";
 
-const storageService = new StorageService();
+const authService = new AuthService();
 
 const loginForm = document.getElementById("loginForm");
 const messageElement = document.getElementById("loginMessage");
+
+const currentUser = authService.getCurrentUser();
+
+if (currentUser) {
+  authService.redirectByRole(currentUser);
+}
 
 loginForm.addEventListener("submit", event => {
   event.preventDefault();
@@ -17,30 +22,15 @@ loginForm.addEventListener("submit", event => {
     return;
   }
 
-  const user = storageService.findUserByCredentials(email, password);
+  const user = authService.login(email, password);
 
   if (!user) {
     showMessage("Invalid email or password.");
     return;
   }
 
-  storageService.setCurrentUser(user);
-  redirectByRole(user.role);
+  authService.redirectByRole(user);
 });
-
-function redirectByRole(role) {
-  if (role === User.Roles.TEACHER) {
-    window.location.href = "teacher-dashboard.html";
-    return;
-  }
-
-  if (role === User.Roles.STUDENT) {
-    window.location.href = "student-dashboard.html";
-    return;
-  }
-
-  showMessage("This user has an invalid role.");
-}
 
 function showMessage(message) {
   messageElement.textContent = message;
