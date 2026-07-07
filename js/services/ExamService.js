@@ -42,6 +42,10 @@ export class ExamService {
     return allExamClones;
   }
 
+  getExamsByTeacherId(teacherId) {
+    return this.getAllExams().filter(exam => exam.teacherId === teacherId);
+  }
+
   // Save to localStorage
   saveExam(exam) {
     const exams = this.getAllExams();
