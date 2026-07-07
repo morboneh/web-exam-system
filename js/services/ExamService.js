@@ -46,6 +46,25 @@ export class ExamService {
     return this.getAllExams().filter(exam => exam.teacherId === teacherId);
   }
 
+  generateUniqueExamCode() {
+    const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const existingCodes = new Set(
+      this.getAllExams()
+        .filter(exam => exam.code)
+        .map(exam => exam.code.toUpperCase())
+    );
+    let code;
+
+    do {
+      code = Array.from({ length: 6 }, () => {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        return characters[randomIndex];
+      }).join("");
+    } while (existingCodes.has(code));
+
+    return code;
+  }
+
   // Save to localStorage
   saveExam(exam) {
     const exams = this.getAllExams();

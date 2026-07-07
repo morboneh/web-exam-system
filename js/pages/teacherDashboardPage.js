@@ -1,4 +1,5 @@
 import { Exam } from "../models/Exam.js";
+import { Question } from "../models/Question.js";
 import { User } from "../models/User.js";
 import { AuthService } from "../services/AuthService.js";
 import { ExamService } from "../services/ExamService.js";
@@ -14,6 +15,11 @@ if (teacher) {
 function initializeDashboard(currentTeacher) {
   const teacherNameElement = document.getElementById("teacherName");
   const logoutButton = document.getElementById("logoutButton");
+  const openCreateExamButton = document.getElementById("openCreateExamButton");
+  const closeCreateExamButton = document.getElementById("closeCreateExamButton");
+  const cancelCreateExamButton = document.getElementById("cancelCreateExamButton");
+  const addQuestionButton = document.getElementById("addQuestionButton");
+  const createExamDialog = document.getElementById("createExamDialog");
   const createExamForm = document.getElementById("createExamForm");
 
   teacherNameElement.textContent = currentTeacher.fullName;
@@ -23,35 +29,145 @@ function initializeDashboard(currentTeacher) {
     window.location.href = "index.html";
   });
 
+  openCreateExamButton.addEventListener("click", () => {
+    createExamDialog.showModal();
+  });
+
+  closeCreateExamButton.addEventListener("click", closeAndResetCreateExamDialog);
+  cancelCreateExamButton.addEventListener("click", closeAndResetCreateExamDialog);
+  createExamDialog.addEventListener("cancel", event => {
+    event.preventDefault();
+    closeAndResetCreateExamDialog();
+  });
+
+  addQuestionButton.addEventListener("click", addQuestionFields);
+
   createExamForm.addEventListener("submit", event => {
     event.preventDefault();
 
     const title = document.getElementById("title").value.trim();
     const description = document.getElementById("description").value.trim();
     const category = document.getElementById("category").value.trim();
-    const code = document.getElementById("examCode").value.trim();
     const duration = Number(document.getElementById("duration").value);
 
-    if (!title || !description || !category || !code || !Number.isFinite(duration) || duration <= 0) {
-      showMessage("Please fill in all fields with valid values.", "error");
+    if (!title || !description || !category || !Number.isFinite(duration) || duration <= 0) {
+      showModalMessage("Please fill in all exam fields with valid values.");
       return;
     }
+
+    const questions = getQuestionsFromForm();
+
+    if (!questions) {
+      showModalMessage("Please complete every question and select its correct answer.");
+      return;
+    }
+
+    const code = examService.generateUniqueExamCode();
 
     const exam = new Exam(title, {
       description,
       category,
       code,
       duration,
-      teacherId: currentTeacher.id
+      teacherId: currentTeacher.id,
+      questions
     });
 
     examService.saveExam(exam);
-    createExamForm.reset();
-    showMessage("Exam created successfully.", "success");
+    closeAndResetCreateExamDialog();
+    showMessage(`Exam created successfully. Code: ${code}`, "success");
     renderExams(currentTeacher.id);
   });
 
   renderExams(currentTeacher.id);
+}
+
+function addQuestionFields() {
+  const questionFields = document.getElementById("questionFields");
+  const questionNumber = questionFields.children.length + 1;
+  const questionBox = document.createElement("fieldset");
+  questionBox.className = "question-box";
+  questionBox.dataset.questionNumber = questionNumber;
+
+  const legend = document.createElement("legend");
+  legend.className = "h6";
+  legend.textContent = `Question ${questionNumber}`;
+  questionBox.append(legend);
+
+  const questionLabel = document.createElement("label");
+  questionLabel.className = "form-label";
+  questionLabel.htmlFor = `questionText${questionNumber}`;
+  questionLabel.textContent = "Question text";
+
+  const questionInput = document.createElement("input");
+  questionInput.id = `questionText${questionNumber}`;
+  questionInput.className = "form-control mb-3 question-text";
+  questionInput.type = "text";
+  questionInput.required = true;
+
+  questionBox.append(questionLabel, questionInput);
+
+  for (let answerIndex = 0; answerIndex < 4; answerIndex += 1) {
+    const answerRow = document.createElement("div");
+    answerRow.className = "input-group mb-2";
+
+    const radioWrapper = document.createElement("span");
+    radioWrapper.className = "input-group-text";
+
+    const correctAnswerRadio = document.createElement("input");
+    correctAnswerRadio.className = "form-check-input mt-0 correct-answer";
+    correctAnswerRadio.type = "radio";
+    correctAnswerRadio.name = `correctAnswer${questionNumber}`;
+    correctAnswerRadio.value = answerIndex;
+    correctAnswerRadio.required = true;
+    correctAnswerRadio.setAttribute("aria-label", `Mark answer ${answerIndex + 1} as correct`);
+
+    const answerInput = document.createElement("input");
+    answerInput.className = "form-control answer-option";
+    answerInput.type = "text";
+    answerInput.placeholder = `Answer option ${answerIndex + 1}`;
+    answerInput.setAttribute("aria-label", `Answer option ${answerIndex + 1}`);
+    answerInput.required = true;
+
+    radioWrapper.append(correctAnswerRadio);
+    answerRow.append(radioWrapper, answerInput);
+    questionBox.append(answerRow);
+  }
+
+  questionFields.append(questionBox);
+  document.getElementById("noQuestionsMessage").hidden = true;
+}
+
+function getQuestionsFromForm() {
+  const questionBoxes = document.querySelectorAll("#questionFields .question-box");
+  const questions = [];
+
+  for (const questionBox of questionBoxes) {
+    const text = questionBox.querySelector(".question-text").value.trim();
+    const answers = Array.from(questionBox.querySelectorAll(".answer-option"), input => input.value.trim());
+    const selectedAnswer = questionBox.querySelector(".correct-answer:checked");
+
+    if (!text || answers.some(answer => !answer) || !selectedAnswer) {
+      return null;
+    }
+
+    questions.push(new Question(text, answers, Number(selectedAnswer.value)));
+  }
+
+  return questions;
+}
+
+function closeAndResetCreateExamDialog() {
+  const createExamDialog = document.getElementById("createExamDialog");
+
+  document.getElementById("createExamForm").reset();
+  document.getElementById("questionFields").replaceChildren();
+  document.getElementById("noQuestionsMessage").hidden = false;
+  showModalMessage("");
+
+  if (createExamDialog.open) {
+    createExamDialog.close();
+  }
 }
 
 function renderExams(teacherId) {
@@ -125,4 +241,10 @@ function showMessage(message, type) {
   const messageElement = document.getElementById("dashboardMessage");
   messageElement.textContent = message;
   messageElement.className = `form-message ${type} mb-3`;
+}
+
+function showModalMessage(message) {
+  const messageElement = document.getElementById("modalMessage");
+  messageElement.textContent = message;
+  messageElement.className = message ? "form-message error" : "form-message";
 }

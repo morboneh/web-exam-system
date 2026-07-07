@@ -26,50 +26,65 @@
 
     <div id="dashboardMessage" class="form-message mb-3" aria-live="polite"></div>
 
-    <section class="card mb-5" aria-labelledby="create-exam-heading">
-      <div class="card-body">
-        <h2 id="create-exam-heading" class="h4 mb-3">Create Exam</h2>
-
-        <form id="createExamForm">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label for="title" class="form-label">Title</label>
-              <input id="title" class="form-control" type="text" required>
-            </div>
-
-            <div class="col-md-6">
-              <label for="category" class="form-label">Category</label>
-              <input id="category" class="form-control" type="text" required>
-            </div>
-
-            <div class="col-12">
-              <label for="description" class="form-label">Description</label>
-              <textarea id="description" class="form-control" rows="3" required></textarea>
-            </div>
-
-            <div class="col-md-6">
-              <label for="examCode" class="form-label">Exam Code</label>
-              <input id="examCode" class="form-control" type="text" required>
-            </div>
-
-            <div class="col-md-6">
-              <label for="duration" class="form-label">Duration (minutes)</label>
-              <input id="duration" class="form-control" type="number" min="1" required>
-            </div>
-
-            <div class="col-12">
-              <button class="btn btn-primary" type="submit">Create Exam</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </section>
-
     <section aria-labelledby="my-exams-heading">
-      <h2 id="my-exams-heading" class="h3 mb-3">My Exams</h2>
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+        <h2 id="my-exams-heading" class="h3 mb-0">My Exams</h2>
+        <button id="openCreateExamButton" class="btn btn-primary" type="button">Create Exam</button>
+      </div>
       <div id="examList" class="row g-3"></div>
     </section>
   </main>
+
+  <dialog id="createExamDialog" class="exam-dialog">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h2 class="h4 mb-0">Create Exam</h2>
+      <button id="closeCreateExamButton" class="btn-close" type="button" aria-label="Close"></button>
+    </div>
+
+    <div id="modalMessage" class="form-message" aria-live="polite"></div>
+
+    <form id="createExamForm">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="title" class="form-label">Title</label>
+          <input id="title" class="form-control" type="text" required>
+        </div>
+
+        <div class="col-md-6">
+          <label for="category" class="form-label">Category</label>
+          <input id="category" class="form-control" type="text" required>
+        </div>
+
+        <div class="col-12">
+          <label for="description" class="form-label">Description</label>
+          <textarea id="description" class="form-control" rows="3" required></textarea>
+        </div>
+
+        <div class="col-md-6">
+          <label for="duration" class="form-label">Duration (minutes)</label>
+          <input id="duration" class="form-control" type="number" min="1" required>
+        </div>
+      </div>
+
+      <hr class="my-4">
+
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+        <h3 class="h5 mb-0">Initial Questions</h3>
+        <button id="addQuestionButton" class="btn btn-outline-primary btn-sm" type="button">
+          Add Another Question
+        </button>
+      </div>
+
+      <p id="noQuestionsMessage" class="text-secondary small">Questions are optional.</p>
+      <div id="questionFields"></div>
+
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button id="cancelCreateExamButton" class="btn btn-outline-secondary" type="button">Cancel</button>
+        <button class="btn btn-primary" type="submit">Save Exam</button>
+      </div>
+    </form>
+  </dialog>
+
   <script type="module" src="js/pages/teacherDashboardPage.js"></script>
 </body>
 </html>
