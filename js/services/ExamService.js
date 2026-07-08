@@ -102,6 +102,21 @@ export class ExamService {
     return exams.find(exam => exam.id === examId);
   }
 
+  searchExamsByTitleOrCode(query) {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return this.getAllExams();
+    }
+
+    return this.getAllExams().filter(exam => {
+      const title = exam.title.toLowerCase();
+      const code = exam.code?.toLowerCase() ?? "";
+
+      return title.includes(normalizedQuery) || code.includes(normalizedQuery);
+    });
+  }
+
   isExamCodeAvailable(code, currentExamId = null) {
     const normalizedCode = code.trim().toUpperCase();
 

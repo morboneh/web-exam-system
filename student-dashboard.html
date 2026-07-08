@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard | Exam Management Web App</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="border-bottom bg-white">
+    <nav class="container d-flex align-items-center justify-content-between py-3" aria-label="Student navigation">
+      <a class="text-decoration-none fw-bold" href="student-dashboard.html">Exam Management</a>
+      <button id="logoutButton" class="btn btn-outline-danger" type="button">Logout</button>
+    </nav>
+  </header>
+
+  <main class="container py-5">
+    <div class="mb-4">
+      <h1>Student Dashboard</h1>
+      <p class="text-secondary mb-0">Welcome, <span id="studentName"></span>.</p>
+    </div>
+
+    <section class="card">
+      <div class="card-body">
+        <h2 class="h4">Find an Exam</h2>
+        <p class="text-secondary">
+          Search for available exams by title or code. Completed exams, grades, history, and your average score will appear here after exam results are saved in a later stage.
+        </p>
+        <a class="btn btn-primary" href="search-exam.html">Search Exams</a>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/pages/studentDashboardPage.js"></script>
+</body>
+</html>
