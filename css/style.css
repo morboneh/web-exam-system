@@ -58,6 +58,36 @@ body {
   color: #b02a37;
 }
 
+.exam-timer {
+  min-width: 150px;
+  padding: 0.75rem 1rem;
+  border: 1px solid #adb5bd;
+  border-radius: 8px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.exam-timer strong {
+  font-size: 1.5rem;
+}
+
+.exam-timer.warning {
+  border-color: #dc3545;
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.exam-question:disabled,
+.exam-question:has(input:disabled) {
+  background-color: #e9ecef;
+}
+
+.result-score {
+  color: #146c43;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
 .exam-dialog {
   width: min(760px, calc(100% - 2rem));
   max-height: calc(100vh - 2rem);

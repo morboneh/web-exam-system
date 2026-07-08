@@ -1,9 +1,11 @@
 import { User } from "../models/User.js";
 import { AuthService } from "../services/AuthService.js";
 import { ExamService } from "../services/ExamService.js";
+import { ResultService } from "../services/ResultService.js";
 
 const authService = new AuthService();
 const examService = new ExamService();
+const resultService = new ResultService();
 const student = authService.requireRole(User.Roles.STUDENT);
 
 if (student) {
@@ -25,17 +27,17 @@ function initializeSearchPage(currentStudent) {
 
   searchForm.addEventListener("submit", event => {
     event.preventDefault();
-    renderSearchResults(searchInput.value);
+    renderSearchResults(searchInput.value, currentStudent);
   });
 
   searchInput.addEventListener("input", () => {
-    renderSearchResults(searchInput.value);
+    renderSearchResults(searchInput.value, currentStudent);
   });
 
-  renderSearchResults("");
+  renderSearchResults("", currentStudent);
 }
 
-function renderSearchResults(query) {
+function renderSearchResults(query, currentStudent) {
   const searchResults = document.getElementById("searchResults");
   const searchMessage = document.getElementById("searchMessage");
   const resultsCount = document.getElementById("resultsCount");
@@ -56,11 +58,11 @@ function renderSearchResults(query) {
   }
 
   exams.forEach(exam => {
-    searchResults.append(createExamResultCard(exam));
+    searchResults.append(createExamResultCard(exam, currentStudent));
   });
 }
 
-function createExamResultCard(exam) {
+function createExamResultCard(exam, currentStudent) {
   const column = document.createElement("div");
   column.className = "col-md-6 col-lg-4";
 
@@ -86,10 +88,19 @@ function createExamResultCard(exam) {
   questionCount.className = "small text-secondary";
   questionCount.textContent = `Questions: ${exam.getQuestionCount()}`;
 
-  const openLink = document.createElement("a");
-  openLink.className = "btn btn-primary btn-sm mt-auto";
-  openLink.href = `take-exam.html?id=${encodeURIComponent(exam.id)}`;
-  openLink.textContent = "Start Exam";
+  const isCompleted = resultService.hasStudentCompletedExam(currentStudent.id, exam.id);
+  const openLink = isCompleted
+    ? document.createElement("button")
+    : document.createElement("a");
+  openLink.className = `btn btn-sm mt-auto ${isCompleted ? "btn-secondary" : "btn-primary"}`;
+  openLink.textContent = isCompleted ? "Completed" : "Start Exam";
+
+  if (isCompleted) {
+    openLink.type = "button";
+    openLink.disabled = true;
+  } else {
+    openLink.href = `take-exam.html?id=${encodeURIComponent(exam.id)}`;
+  }
 
   cardBody.append(title, description, details, questionCount, openLink);
   card.append(cardBody);
