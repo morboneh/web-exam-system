@@ -24,14 +24,13 @@ export class ExamService {
       });
 
       // inner clone for all the exam's questions
-      exam.questions = examData.questions.map(questionData => {
+      exam.questions = (examData.questions ?? []).map(questionData => {
         const question = new Question(
           questionData.text,
           questionData.answers,
-          questionData.correctAnswerIndex
+          questionData.correctAnswerIndex,
+          { id: questionData.id }
         );
-
-        question.id = questionData.id;
 
         return question;
       });
@@ -76,6 +75,19 @@ export class ExamService {
     this.storageService.saveExams(exams);
   }
 
+  updateExam(updatedExam) {
+    const exams = this.getAllExams();
+    const examIndex = exams.findIndex(exam => exam.id === updatedExam.id);
+
+    if (examIndex === -1) {
+      return false;
+    }
+
+    exams[examIndex] = updatedExam;
+    this.storageService.saveExams(exams);
+    return true;
+  }
+
   deleteExam(examId) {
     const exams = this.getAllExams();
 
@@ -88,6 +100,14 @@ export class ExamService {
     const exams = this.getAllExams();
 
     return exams.find(exam => exam.id === examId);
+  }
+
+  isExamCodeAvailable(code, currentExamId = null) {
+    const normalizedCode = code.trim().toUpperCase();
+
+    return !this.getAllExams().some(exam => {
+      return exam.id !== currentExamId && exam.code?.toUpperCase() === normalizedCode;
+    });
   }
 
   clearAllExams() {
