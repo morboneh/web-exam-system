@@ -2,9 +2,13 @@ import { Question } from "../models/Question.js";
 import { User } from "../models/User.js";
 import { AuthService } from "../services/AuthService.js";
 import { ExamService } from "../services/ExamService.js";
+import { ResultService } from "../services/ResultService.js";
+import { StorageService } from "../services/StorageService.js";
 
 const authService = new AuthService();
 const examService = new ExamService();
+const resultService = new ResultService();
+const storageService = new StorageService();
 const teacher = authService.requireRole(User.Roles.TEACHER);
 
 let currentExam = null;
@@ -17,6 +21,10 @@ function initializeExamDetailsPage(currentTeacher) {
   const logoutButton = document.getElementById("logoutButton");
   const examInfoForm = document.getElementById("examInfoForm");
   const addQuestionForm = document.getElementById("addQuestionForm");
+  const toggleExamInfoFormButton = document.getElementById("toggleExamInfoFormButton");
+  const toggleQuestionsButton = document.getElementById("toggleQuestionsButton");
+  const toggleResultsButton = document.getElementById("toggleResultsButton");
+  const deleteExamButton = document.getElementById("deleteExamButton");
 
   logoutButton.addEventListener("click", () => {
     authService.logout();
@@ -46,8 +54,29 @@ function initializeExamDetailsPage(currentTeacher) {
 
   document.getElementById("examDetailsContent").hidden = false;
   fillExamInformationForm();
+  renderExamInformationSummary();
   renderNewQuestionAnswerFields();
   renderQuestions();
+
+  toggleExamInfoFormButton.addEventListener("click", () => {
+    examInfoForm.hidden = !examInfoForm.hidden;
+  });
+
+  toggleQuestionsButton.addEventListener("click", () => {
+    const questionManagementArea = document.getElementById("questionManagementArea");
+    questionManagementArea.hidden = !questionManagementArea.hidden;
+  });
+
+  toggleResultsButton.addEventListener("click", () => {
+    const studentResultsSection = document.getElementById("studentResultsSection");
+    studentResultsSection.hidden = !studentResultsSection.hidden;
+
+    if (!studentResultsSection.hidden) {
+      renderStudentResults();
+    }
+  });
+
+  deleteExamButton.addEventListener("click", deleteCurrentExam);
 
   examInfoForm.addEventListener("submit", event => {
     event.preventDefault();
@@ -67,6 +96,33 @@ function fillExamInformationForm() {
   document.getElementById("category").value = currentExam.category;
   document.getElementById("examCode").value = currentExam.code;
   document.getElementById("duration").value = currentExam.duration;
+}
+
+function renderExamInformationSummary() {
+  const summary = document.getElementById("examInfoSummary");
+  const rows = [
+    ["ID", currentExam.id],
+    ["Title", currentExam.title],
+    ["Description", currentExam.description],
+    ["Category", currentExam.category],
+    ["Exam code", currentExam.code],
+    ["Duration", `${currentExam.duration} minutes`],
+    ["Questions", currentExam.questions.length]
+  ];
+
+  summary.replaceChildren();
+
+  rows.forEach(([label, value]) => {
+    const term = document.createElement("dt");
+    term.className = "col-sm-3 col-lg-2 text-secondary";
+    term.textContent = label;
+
+    const description = document.createElement("dd");
+    description.className = "col-sm-9 col-lg-10";
+    description.textContent = value || "Not set";
+
+    summary.append(term, description);
+  });
 }
 
 function saveExamInformation() {
@@ -98,7 +154,163 @@ function saveExamInformation() {
   }
 
   document.getElementById("examCode").value = code;
+  renderExamInformationSummary();
+  document.getElementById("examInfoForm").hidden = true;
   showMessage("Exam information saved successfully.", "success");
+}
+
+function deleteCurrentExam() {
+  const confirmed = window.confirm(
+    `Are you sure you want to delete "${currentExam.title}"? This action cannot be undone.`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  examService.deleteExam(currentExam.id);
+  window.location.href = "teacher-dashboard.html";
+}
+
+function renderStudentResults() {
+  const studentResultsList = document.getElementById("studentResultsList");
+  const results = resultService
+    .getResultsByExamId(currentExam.id)
+    .slice()
+    .sort((firstResult, secondResult) => {
+      return new Date(secondResult.submittedAt) - new Date(firstResult.submittedAt);
+    });
+
+  studentResultsList.replaceChildren();
+
+  if (results.length === 0) {
+    const emptyMessage = document.createElement("p");
+    emptyMessage.className = "text-secondary mb-0";
+    emptyMessage.textContent = "No student results yet for this exam.";
+    studentResultsList.append(emptyMessage);
+    return;
+  }
+
+  results.forEach(result => {
+    studentResultsList.append(createStudentResultCard(result));
+  });
+}
+
+function createStudentResultCard(result) {
+  const student = findStudentById(result.studentId);
+  const article = document.createElement("article");
+  article.className = "border rounded p-3 mb-3 bg-white";
+
+  const header = document.createElement("div");
+  header.className = "d-flex flex-column flex-md-row justify-content-between gap-2 mb-2";
+
+  const studentInfo = document.createElement("div");
+  const studentName = document.createElement("h3");
+  studentName.className = "h5 mb-1";
+  studentName.textContent = student?.fullName || "Unknown student";
+
+  const studentEmail = document.createElement("p");
+  studentEmail.className = "small text-secondary mb-0";
+  studentEmail.textContent = student?.email || "Username/email unavailable";
+
+  studentInfo.append(studentName, studentEmail);
+
+  const score = document.createElement("div");
+  score.className = "text-md-end";
+
+  const scoreValue = document.createElement("p");
+  scoreValue.className = "h5 mb-1";
+  scoreValue.textContent = `${Number(result.score) || 0}%`;
+
+  const scoreDetails = document.createElement("p");
+  scoreDetails.className = "small text-secondary mb-0";
+  scoreDetails.textContent =
+    `${Number(result.correctAnswers) || 0} correct out of ${Number(result.totalQuestions) || 0}`;
+
+  score.append(scoreValue, scoreDetails);
+
+  header.append(studentInfo, score);
+
+  const submittedAt = document.createElement("p");
+  submittedAt.className = "small text-secondary mb-2";
+  submittedAt.textContent = `Submitted: ${formatSubmissionDate(result.submittedAt)}`;
+
+  const unanswered = document.createElement("p");
+  unanswered.className = "mb-1";
+  unanswered.textContent = `Unanswered questions: ${formatQuestionNumbers(result.unansweredQuestionIndexes)}`;
+
+  const wrong = document.createElement("p");
+  wrong.className = "mb-2";
+  wrong.textContent = `Wrong questions: ${formatQuestionNumbers(result.wrongQuestionIndexes)}`;
+
+  article.append(header, submittedAt, unanswered, wrong);
+
+  const wrongAnswerList = createWrongAnswerList(result);
+  if (wrongAnswerList) {
+    article.append(wrongAnswerList);
+  }
+
+  return article;
+}
+
+function createWrongAnswerList(result) {
+  const wrongQuestionIndexes = result.wrongQuestionIndexes ?? [];
+
+  if (wrongQuestionIndexes.length === 0) {
+    return null;
+  }
+
+  const list = document.createElement("div");
+  list.className = "small border-top pt-2 mt-2";
+
+  wrongQuestionIndexes.forEach(questionIndex => {
+    const question = currentExam.questions[questionIndex];
+    const selectedAnswerIndex = result.selectedAnswerIndexes?.[questionIndex];
+    const item = document.createElement("p");
+    item.className = "mb-1";
+
+    const selectedAnswer = getAnswerText(question, selectedAnswerIndex);
+    const correctAnswer = getAnswerText(question, question?.correctAnswerIndex);
+
+    item.textContent =
+      `Question #${questionIndex + 1}: selected ${selectedAnswer}; correct answer ${correctAnswer}`;
+    list.append(item);
+  });
+
+  return list;
+}
+
+function getAnswerText(question, answerIndex) {
+  if (!question || answerIndex === null || answerIndex === undefined || answerIndex === "") {
+    return "not saved";
+  }
+
+  return question.answers?.[Number(answerIndex)] ?? "not saved";
+}
+
+function findStudentById(studentId) {
+  return storageService.getUsers().find(user => user.id === studentId) ?? null;
+}
+
+function formatSubmissionDate(submittedAt) {
+  const date = new Date(submittedAt);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Unknown date";
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(date);
+}
+
+function formatQuestionNumbers(indexes = []) {
+  if (indexes.length === 0) {
+    return "None";
+  }
+
+  return indexes.map(index => `#${index + 1}`).join(", ");
 }
 
 // Render each saved question as an editable form.
@@ -228,6 +440,7 @@ function addQuestion() {
   addQuestionForm.reset();
   renderNewQuestionAnswerFields();
   renderQuestions();
+  renderExamInformationSummary();
   showMessage("Question added successfully.", "success");
 }
 
@@ -261,9 +474,16 @@ function saveQuestion(questionId, questionForm) {
 }
 
 function deleteQuestion(questionId) {
+  const confirmed = window.confirm("Are you sure you want to delete this question?");
+
+  if (!confirmed) {
+    return;
+  }
+
   currentExam.questions = currentExam.questions.filter(question => question.id !== questionId);
   examService.updateExam(currentExam);
   renderQuestions();
+  renderExamInformationSummary();
   showMessage("Question deleted successfully.", "success");
 }
 

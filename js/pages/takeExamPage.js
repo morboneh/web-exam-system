@@ -205,6 +205,7 @@ function saveCurrentResult(currentStudent, submittedBy) {
     {
       wrongQuestionIndexes: evaluation.wrongQuestionIndexes,
       unansweredQuestionIndexes: evaluation.unansweredQuestionIndexes,
+      selectedAnswerIndexes: evaluation.selectedAnswerIndexes,
       submittedBy
     }
   );
@@ -223,24 +224,29 @@ function saveCurrentResult(currentStudent, submittedBy) {
 function evaluateAnswers() {
   const wrongQuestionIndexes = [];
   const unansweredQuestionIndexes = [];
+  const selectedAnswerIndexes = [];
   let correctAnswers = 0;
 
   currentExam.questions.forEach((question, questionIndex) => {
     const selectedAnswer = document.querySelector(`input[name="question-${questionIndex}"]:checked`);
 
     if (!selectedAnswer) {
+      selectedAnswerIndexes[questionIndex] = null;
       unansweredQuestionIndexes.push(questionIndex);
       return;
     }
 
-    if (question.isCorrect(Number(selectedAnswer.value))) {
+    const selectedAnswerIndex = Number(selectedAnswer.value);
+    selectedAnswerIndexes[questionIndex] = selectedAnswerIndex;
+
+    if (question.isCorrect(selectedAnswerIndex)) {
       correctAnswers += 1;
     } else {
       wrongQuestionIndexes.push(questionIndex);
     }
   });
 
-  return { correctAnswers, wrongQuestionIndexes, unansweredQuestionIndexes };
+  return { correctAnswers, wrongQuestionIndexes, unansweredQuestionIndexes, selectedAnswerIndexes };
 }
 
 function lockExam() {

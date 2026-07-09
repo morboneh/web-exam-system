@@ -10,6 +10,7 @@ export class ExamResult {
     this.status = options.status ?? "completed";
     this.wrongQuestionIndexes = options.wrongQuestionIndexes ?? [];
     this.unansweredQuestionIndexes = options.unansweredQuestionIndexes ?? [];
+    this.selectedAnswerIndexes = options.selectedAnswerIndexes ?? [];
     this.submittedBy = options.submittedBy ?? "manual";
   }
 }

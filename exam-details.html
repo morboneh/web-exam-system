@@ -30,7 +30,26 @@
         <p class="text-secondary mb-0">Edit exam information and manage its questions.</p>
       </div>
 
-      <form id="examInfoForm" class="card mb-4">
+      <section class="card mb-4" aria-labelledby="exam-info-heading">
+        <div class="card-body">
+          <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between gap-3 mb-3">
+            <div>
+              <h2 id="exam-info-heading" class="h4 mb-1">Exam Information</h2>
+              <p class="text-secondary mb-0">Review the current exam setup.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <button id="toggleExamInfoFormButton" class="btn btn-outline-primary" type="button">Edit Exam Details</button>
+              <button id="toggleQuestionsButton" class="btn btn-outline-primary" type="button">Manage Questions</button>
+              <button id="toggleResultsButton" class="btn btn-outline-primary" type="button">View Student Results</button>
+              <button id="deleteExamButton" class="btn btn-outline-danger" type="button">Delete Exam</button>
+            </div>
+          </div>
+
+          <dl id="examInfoSummary" class="row mb-0"></dl>
+        </div>
+      </section>
+
+      <form id="examInfoForm" class="card mb-4" hidden>
         <div class="card-body">
           <h2 class="h4 mb-3">Exam Information</h2>
 
@@ -70,33 +89,42 @@
         </div>
       </form>
 
-      <section class="card mb-4" aria-labelledby="questions-heading">
-        <div class="card-body">
-          <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
-            <div>
-              <h2 id="questions-heading" class="h4 mb-1">Questions</h2>
-              <p id="questionCount" class="text-secondary mb-0"></p>
+      <div id="questionManagementArea" hidden>
+        <section class="card mb-4" aria-labelledby="questions-heading">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+              <div>
+                <h2 id="questions-heading" class="h4 mb-1">Questions</h2>
+                <p id="questionCount" class="text-secondary mb-0"></p>
+              </div>
             </div>
+
+            <div id="questionsList"></div>
           </div>
+        </section>
 
-          <div id="questionsList"></div>
-        </div>
-      </section>
+        <section class="card mb-4" aria-labelledby="add-question-heading">
+          <div class="card-body">
+            <h2 id="add-question-heading" class="h4 mb-3">Add Question</h2>
 
-      <section class="card" aria-labelledby="add-question-heading">
+            <form id="addQuestionForm">
+              <div class="mb-3">
+                <label for="newQuestionText" class="form-label">Question text</label>
+                <input id="newQuestionText" class="form-control" type="text" required>
+              </div>
+
+              <div id="newQuestionAnswers" class="mb-3"></div>
+
+              <button class="btn btn-primary" type="submit">Add Question</button>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <section id="studentResultsSection" class="card" aria-labelledby="student-results-heading" hidden>
         <div class="card-body">
-          <h2 id="add-question-heading" class="h4 mb-3">Add Question</h2>
-
-          <form id="addQuestionForm">
-            <div class="mb-3">
-              <label for="newQuestionText" class="form-label">Question text</label>
-              <input id="newQuestionText" class="form-control" type="text" required>
-            </div>
-
-            <div id="newQuestionAnswers" class="mb-3"></div>
-
-            <button class="btn btn-primary" type="submit">Add Question</button>
-          </form>
+          <h2 id="student-results-heading" class="h4 mb-3">Student Results</h2>
+          <div id="studentResultsList"></div>
         </div>
       </section>
     </section>

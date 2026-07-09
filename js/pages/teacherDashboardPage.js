@@ -211,6 +211,10 @@ function createExamCard(exam, teacherId) {
   details.className = "small text-secondary";
   details.textContent = `Category: ${exam.category} | Code: ${exam.code} | Duration: ${exam.duration} minutes`;
 
+  const questionCount = document.createElement("p");
+  questionCount.className = "small text-secondary";
+  questionCount.textContent = `Questions: ${exam.questions.length}`;
+
   const actions = document.createElement("div");
   actions.className = "d-flex gap-2 mt-auto";
 
@@ -224,13 +228,21 @@ function createExamCard(exam, teacherId) {
   deleteButton.type = "button";
   deleteButton.textContent = "Delete";
   deleteButton.addEventListener("click", () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${exam.title}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     examService.deleteExam(exam.id);
     showMessage("Exam deleted successfully.", "success");
     renderExams(teacherId);
   });
 
   actions.append(detailsLink, deleteButton);
-  cardBody.append(title, description, details, actions);
+  cardBody.append(title, description, details, questionCount, actions);
   card.append(cardBody);
   column.append(card);
 
