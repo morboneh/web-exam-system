@@ -89,20 +89,36 @@ function createExamResultCard(exam, currentStudent) {
   questionCount.textContent = `Questions: ${exam.getQuestionCount()}`;
 
   const isCompleted = resultService.hasStudentCompletedExam(currentStudent.id, exam.id);
-  const openLink = isCompleted
+  const hasQuestions = exam.getQuestionCount() > 0;
+  // Keep empty exams visible, but do not let students start an exam that has nothing to answer.
+  const openLink = isCompleted || !hasQuestions
     ? document.createElement("button")
     : document.createElement("a");
-  openLink.className = `btn btn-sm mt-auto ${isCompleted ? "btn-secondary" : "btn-primary"}`;
-  openLink.textContent = isCompleted ? "Completed" : "Start Exam";
+  openLink.className = `btn btn-sm mt-auto ${isCompleted || !hasQuestions ? "btn-secondary" : "btn-primary"}`;
 
   if (isCompleted) {
     openLink.type = "button";
     openLink.disabled = true;
+    openLink.textContent = "Completed";
+  } else if (!hasQuestions) {
+    openLink.type = "button";
+    openLink.disabled = true;
+    openLink.textContent = "Not Available Yet";
   } else {
+    openLink.textContent = "Start Exam";
     openLink.href = `take-exam.html?id=${encodeURIComponent(exam.id)}`;
   }
 
-  cardBody.append(title, description, details, questionCount, openLink);
+  const cardElements = [title, description, details, questionCount];
+
+  if (!hasQuestions) {
+    const availabilityMessage = document.createElement("p");
+    availabilityMessage.className = "small text-secondary";
+    availabilityMessage.textContent = "This exam is not available yet because it has no questions.";
+    cardElements.push(availabilityMessage);
+  }
+
+  cardBody.append(...cardElements, openLink);
   card.append(cardBody);
   column.append(card);
 

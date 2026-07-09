@@ -1,23 +1,124 @@
-# Exam Management Web App
+# Exam Management System
 
-A simple exam management web app for a web development course. This repository currently contains the existing baseline version of the project.
+A client-side web application for creating, taking, and reviewing exams. The project was built as a web development student project and uses browser storage instead of a backend server or database.
 
-## Current Structure
+## Technologies
 
-- `index.html` - main page
-- `css/` - stylesheets
-- `js/` - JavaScript files
+- HTML
+- CSS
+- JavaScript
+- ES Modules
+- OOP classes
+- JSON
+- localStorage
+- Bootstrap
 
-## Run Locally
+## How To Run
 
-Open `index.html` directly in your browser.
+Open `index.html` in a browser, or use VS Code Live Server for a smoother local development experience.
 
-You can also run it with VS Code Live Server for a smoother local development setup.
+This project has no backend, server, or external database. All data is saved in the browser using `localStorage`.
 
-## Current Status
+## User Roles
 
-The existing version was added as the initial baseline.
+- **Teacher** - creates and manages exams.
+- **Student** - searches for exams, takes available exams, and reviews grades.
 
-## Development Plan
+## Teacher Features
 
-Future changes will be done in small commits, with each commit focused on one page, module, or feature.
+- Register and log in as a teacher.
+- Create exams with a title, description, category, duration, and generated exam code.
+- Edit exam details.
+- Add, edit, and delete multiple-choice questions.
+- Delete exams with confirmation.
+- View student results for each exam.
+- Review wrong and unanswered question numbers for submitted results.
+
+## Student Features
+
+- Register and log in as a student.
+- Search exams by title or exam code.
+- View available exams and their question count.
+- Take exams that already contain questions.
+- See the score immediately after submission.
+- View completed exam history.
+- View average score and highest score.
+
+## Project Structure
+
+- `index.html` - public home page.
+- `register.html` / `login.html` - authentication pages.
+- `teacher-dashboard.html` - teacher exam dashboard.
+- `exam-details.html` - teacher exam editing, question management, and result review.
+- `student-dashboard.html` - student score summary and result history.
+- `search-exam.html` - student exam search page.
+- `take-exam.html` - student exam-taking page.
+- `css/` - shared styling.
+- `js/models/` - data classes such as `User`, `Exam`, `Question`, and `ExamResult`.
+- `js/services/` - business logic and localStorage access.
+- `js/pages/` - page-specific scripts that connect HTML, services, and DOM events.
+- `js/ui/` - original UI helper code kept from the classroom version where relevant.
+
+## Architecture
+
+The project is organized into small modules:
+
+- **Models** represent the main data entities.
+- **Services** contain business logic and storage-related operations.
+- **Page scripts** control each page, listen to DOM events, and call services.
+- **StorageService** centralizes all `localStorage` reads and writes.
+- **AuthService** handles login, logout, session checks, and role-based redirects.
+
+This keeps data structure, storage logic, and page behavior separated while still staying simple enough for a client-side course project.
+
+## Data Persistence
+
+The application stores data in `localStorage` as JSON.
+
+Stored data includes:
+
+- `users`
+- `exams`
+- `results`
+- `currentUser`
+
+Because the data is stored only in the browser, clearing browser storage will remove the saved users, exams, sessions, and results.
+
+## Optional Features Included
+
+- Exam timer with automatic submission.
+- Exam categories.
+- Generated exam codes.
+- Student grade history.
+- Student average and highest score.
+- Teacher review of student results.
+- Confirmation dialogs before deleting exams or questions.
+
+## Manual Testing Checklist
+
+1. Register a teacher account.
+2. Log in as the teacher.
+3. Create a new exam.
+4. Add questions to the exam.
+5. Edit exam details and verify the changes are saved.
+6. Register a student account.
+7. Log in as the student.
+8. Search for the exam by title or exam code.
+9. Take the exam and submit answers.
+10. View the result on the student dashboard.
+11. Log back in as the teacher.
+12. Open the exam details page and view student results.
+13. Test that an exam with zero questions is visible but cannot be started.
+14. Test protected pages and role redirects:
+    - Logged-out users should be redirected to login.
+    - Students should not access teacher pages.
+    - Teachers should not access student pages.
+    - Teachers should not access exams owned by another teacher.
+
+## Known Limitations
+
+- Data is stored only in the browser `localStorage`.
+- This is not a secure production authentication system.
+- No backend database is used.
+- Clearing browser storage removes all saved data.
+- The app is intended for learning and demonstration, not production use.
