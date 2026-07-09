@@ -186,6 +186,7 @@ function updateTimer(endTime) {
 }
 
 function saveCurrentResult(currentStudent, submittedBy) {
+  // Several events can try to submit at once, so keep only the first saved result.
   if (savedResult) {
     return savedResult;
   }

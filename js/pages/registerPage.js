@@ -23,7 +23,7 @@ registerForm.addEventListener("submit", event => {
   const role = document.getElementById("role").value;
 
   if (!fullName || !email || !password || !role) {
-    showMessage("Please fill in all fields.", "error");
+    showMessage("Please enter your name, email, password, and role.", "error");
     return;
   }
 

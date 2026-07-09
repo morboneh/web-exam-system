@@ -119,7 +119,9 @@ function renderExamInformationSummary() {
 
     const description = document.createElement("dd");
     description.className = "col-sm-9 col-lg-10";
-    description.textContent = value || "Not set";
+    description.textContent = value === "" || value === null || value === undefined
+      ? "Not set"
+      : value;
 
     summary.append(term, description);
   });
@@ -133,7 +135,7 @@ function saveExamInformation() {
   const duration = Number(document.getElementById("duration").value);
 
   if (!title || !description || !category || !code || !Number.isFinite(duration) || duration <= 0) {
-    showMessage("Please fill in all exam fields with valid values.", "error");
+    showMessage("Please fill in the title, description, category, code, and a valid duration.", "error");
     return;
   }
 

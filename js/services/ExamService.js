@@ -10,9 +10,8 @@ export class ExamService {
   getAllExams() {
     const plainExams = this.storageService.getExams();
 
-    // for each examData(Exam) return new Exam object with the same data
-    // simply putting - creates a clone of each exam
-    let allExamClones = plainExams.map(examData => {
+    // Stored JSON is plain data, so rebuild Exam and Question objects before using their methods.
+    const allExamClones = plainExams.map(examData => {
       const exam = new Exam(examData.title, {
         id: examData.id,
         description: examData.description,
@@ -23,16 +22,13 @@ export class ExamService {
         createdAt: examData.createdAt
       });
 
-      // inner clone for all the exam's questions
       exam.questions = (examData.questions ?? []).map(questionData => {
-        const question = new Question(
+        return new Question(
           questionData.text,
           questionData.answers,
           questionData.correctAnswerIndex,
           { id: questionData.id }
         );
-
-        return question;
       });
 
       return exam;
@@ -46,6 +42,7 @@ export class ExamService {
   }
 
   generateUniqueExamCode() {
+    // Avoid confusing characters like I, O, 0, and 1 in student-facing codes.
     const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     const existingCodes = new Set(
       this.getAllExams()
@@ -64,11 +61,8 @@ export class ExamService {
     return code;
   }
 
-  // Save to localStorage
   saveExam(exam) {
     const exams = this.getAllExams();
-
-    // here we can delete the exam by using this.deleteExam(exam.id); in case it's already there
 
     exams.push(exam);
 

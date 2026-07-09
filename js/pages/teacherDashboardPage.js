@@ -51,7 +51,7 @@ function initializeDashboard(currentTeacher) {
     const duration = Number(document.getElementById("duration").value);
 
     if (!title || !description || !category || !Number.isFinite(duration) || duration <= 0) {
-      showModalMessage("Please fill in all exam fields with valid values.");
+      showModalMessage("Please fill in the title, description, category, and a valid duration.");
       return;
     }
 

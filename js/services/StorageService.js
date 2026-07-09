@@ -8,7 +8,7 @@ export class StorageService {
     };
   }
 
-  // Read JSON from localStorage and return a safe default when the key is empty.
+  // Return the default if the key is empty or the stored JSON is damaged.
   getJson(key, defaultValue) {
     const data = localStorage.getItem(key);
 
@@ -16,7 +16,11 @@ export class StorageService {
       return defaultValue;
     }
 
-    return JSON.parse(data);
+    try {
+      return JSON.parse(data);
+    } catch {
+      return defaultValue;
+    }
   }
 
   saveJson(key, value) {
