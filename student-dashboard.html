@@ -24,14 +24,51 @@
       <p class="text-secondary mb-0">Welcome, <span id="studentName"></span>.</p>
     </div>
 
-    <section class="card">
+    <section class="card mb-4">
       <div class="card-body">
         <h2 class="h4">Find an Exam</h2>
-        <p class="text-secondary">
-          Search for available exams by title or code. Completed exams, grades, history, and your average score will appear here after exam results are saved in a later stage.
-        </p>
+        <p class="text-secondary">Search for available exams by title or code.</p>
         <a class="btn btn-primary" href="search-exam.html">Search Exams</a>
       </div>
+    </section>
+
+    <section class="mb-4" aria-labelledby="summary-heading">
+      <h2 id="summary-heading" class="h3 mb-3">Results Summary</h2>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <article class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 text-secondary">Completed Exams</h3>
+              <p id="completedExamCount" class="h2 mb-0">0</p>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 text-secondary">Average Score</h3>
+              <p id="averageScore" class="h2 mb-0">0%</p>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="card h-100">
+            <div class="card-body">
+              <h3 class="h6 text-secondary">Highest Score</h3>
+              <p id="highestScore" class="h2 mb-0">0%</p>
+            </div>
+          </article>
+        </div>
+      </div>
+      <p id="summaryMessage" class="text-secondary mt-3 mb-0"></p>
+    </section>
+
+    <section aria-labelledby="history-heading">
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+        <h2 id="history-heading" class="h3 mb-0">Completed Exams</h2>
+        <p id="historyCount" class="text-secondary mb-0"></p>
+      </div>
+      <div id="resultsHistory" class="row g-3"></div>
     </section>
   </main>
   <script type="module" src="js/pages/studentDashboardPage.js"></script>
