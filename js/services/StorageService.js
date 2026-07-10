@@ -1,3 +1,4 @@
+// Centralizes all localStorage access so page files do not read or write storage directly.
 export class StorageService {
   constructor() {
     this.keys = {
@@ -27,6 +28,7 @@ export class StorageService {
     localStorage.setItem(key, JSON.stringify(value));
   }
 
+  // User data helpers
   getUsers() {
     return this.getJson(this.keys.users, []);
   }
@@ -58,6 +60,7 @@ export class StorageService {
     return user;
   }
 
+  // Exam data helpers
   getExams() {
     return this.getJson(this.keys.exams, []);
   }
@@ -66,6 +69,7 @@ export class StorageService {
     this.saveJson(this.keys.exams, exams);
   }
 
+  // Result data helpers
   getResults() {
     return this.getJson(this.keys.results, []);
   }
@@ -74,6 +78,7 @@ export class StorageService {
     this.saveJson(this.keys.results, results);
   }
 
+  // Current session helpers
   getCurrentUser() {
     return this.getJson(this.keys.currentUser, null);
   }

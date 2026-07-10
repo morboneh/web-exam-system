@@ -1,3 +1,4 @@
+// Represents an exam created by a teacher, including its saved questions.
 export class Exam {
   constructor(title, options = {}) {
     this.id = options.id ?? crypto.randomUUID();
@@ -15,6 +16,7 @@ export class Exam {
     this.questions.push(question);
   }
 
+  // Used by dashboards and search cards without exposing the questions array directly.
   getQuestionCount() {
     return this.questions.length;
   }

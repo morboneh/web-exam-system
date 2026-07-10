@@ -1,3 +1,4 @@
+// Represents an application account and the role used for page access.
 export class User {
   static Roles = {
     TEACHER: "teacher",

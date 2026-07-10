@@ -1,6 +1,7 @@
 import { User } from "../models/User.js";
 import { StorageService } from "./StorageService.js";
 
+// Handles login state, logout, and role-based page protection.
 export class AuthService {
   constructor() {
     this.storageService = new StorageService();
@@ -29,6 +30,7 @@ export class AuthService {
     return this.getCurrentUser() !== null;
   }
 
+  // Decide which dashboard belongs to the logged-in user's role.
   redirectByRole(user) {
     if (user.role === User.Roles.TEACHER) {
       window.location.href = "teacher-dashboard.html";
@@ -51,6 +53,7 @@ export class AuthService {
     return user;
   }
 
+  // Used at the top of protected page scripts before initializing page behavior.
   requireRole(role) {
     const user = this.requireAuth();
 

@@ -7,10 +7,12 @@ const messageElement = document.getElementById("loginMessage");
 
 const currentUser = authService.getCurrentUser();
 
+// If a user already has an active session, send them to the correct dashboard.
 if (currentUser) {
   authService.redirectByRole(currentUser);
 }
 
+// Validate credentials and create the current session.
 loginForm.addEventListener("submit", event => {
   event.preventDefault();
 
@@ -32,6 +34,7 @@ loginForm.addEventListener("submit", event => {
   authService.redirectByRole(user);
 });
 
+// Login only needs an error message because successful login redirects immediately.
 function showMessage(message) {
   messageElement.textContent = message;
   messageElement.className = "form-message error";

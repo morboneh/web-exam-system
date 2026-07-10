@@ -1,5 +1,6 @@
 import { StorageService } from "./StorageService.js";
 
+// Saves and retrieves completed exam attempts.
 export class ResultService {
   constructor() {
     this.storageService = new StorageService();
@@ -16,6 +17,7 @@ export class ResultService {
     return true;
   }
 
+  // A student can only have one saved result for the same exam.
   hasStudentCompletedExam(studentId, examId) {
     return this.storageService.getResults().some(result =>
       result.studentId === studentId && result.examId === examId

@@ -13,10 +13,12 @@ const teacher = authService.requireRole(User.Roles.TEACHER);
 
 let currentExam = null;
 
+// Stop page setup if the visitor is not an authenticated teacher.
 if (teacher) {
   initializeExamDetailsPage(teacher);
 }
 
+// Load the requested exam, verify ownership, and connect all management controls.
 function initializeExamDetailsPage(currentTeacher) {
   const logoutButton = document.getElementById("logoutButton");
   const examInfoForm = document.getElementById("examInfoForm");
@@ -89,6 +91,7 @@ function initializeExamDetailsPage(currentTeacher) {
   });
 }
 
+// Copy the current exam data into the edit form.
 function fillExamInformationForm() {
   document.getElementById("examId").value = currentExam.id;
   document.getElementById("title").value = currentExam.title;
@@ -98,6 +101,7 @@ function fillExamInformationForm() {
   document.getElementById("duration").value = currentExam.duration;
 }
 
+// Show a read-only summary of the exam setup at the top of the page.
 function renderExamInformationSummary() {
   const summary = document.getElementById("examInfoSummary");
   const rows = [
@@ -127,6 +131,7 @@ function renderExamInformationSummary() {
   });
 }
 
+// Validate and persist changes to the exam's general information.
 function saveExamInformation() {
   const title = document.getElementById("title").value.trim();
   const description = document.getElementById("description").value.trim();
@@ -161,6 +166,7 @@ function saveExamInformation() {
   showMessage("Exam information saved successfully.", "success");
 }
 
+// Delete the current exam after confirmation and return to the teacher dashboard.
 function deleteCurrentExam() {
   const confirmed = window.confirm(
     `Are you sure you want to delete "${currentExam.title}"? This action cannot be undone.`
@@ -174,6 +180,7 @@ function deleteCurrentExam() {
   window.location.href = "teacher-dashboard.html";
 }
 
+// Load all saved submissions for this exam and display them newest first.
 function renderStudentResults() {
   const studentResultsList = document.getElementById("studentResultsList");
   const results = resultService
@@ -198,6 +205,7 @@ function renderStudentResults() {
   });
 }
 
+// Build one teacher-facing result card with student identity and grading details.
 function createStudentResultCard(result) {
   const student = findStudentById(result.studentId);
   const article = document.createElement("article");
@@ -255,6 +263,7 @@ function createStudentResultCard(result) {
   return article;
 }
 
+// Show which answers were wrong when the selected answer history is available.
 function createWrongAnswerList(result) {
   const wrongQuestionIndexes = result.wrongQuestionIndexes ?? [];
 
@@ -282,6 +291,7 @@ function createWrongAnswerList(result) {
   return list;
 }
 
+// Safely format an answer index from a saved result.
 function getAnswerText(question, answerIndex) {
   if (!question || answerIndex === null || answerIndex === undefined || answerIndex === "") {
     return "not saved";
@@ -290,10 +300,12 @@ function getAnswerText(question, answerIndex) {
   return question.answers?.[Number(answerIndex)] ?? "not saved";
 }
 
+// Results store student IDs, so the display name is looked up from saved users.
 function findStudentById(studentId) {
   return storageService.getUsers().find(user => user.id === studentId) ?? null;
 }
 
+// Keep date formatting consistent between result cards.
 function formatSubmissionDate(submittedAt) {
   const date = new Date(submittedAt);
 
@@ -307,6 +319,7 @@ function formatSubmissionDate(submittedAt) {
   }).format(date);
 }
 
+// Convert zero-based saved question indexes into human-readable numbers.
 function formatQuestionNumbers(indexes = []) {
   if (indexes.length === 0) {
     return "None";
@@ -336,6 +349,7 @@ function renderQuestions() {
   });
 }
 
+// Build the edit form for one saved question.
 function createQuestionEditor(question, questionIndex) {
   const form = document.createElement("form");
   form.className = "question-box";
@@ -386,6 +400,7 @@ function createQuestionEditor(question, questionIndex) {
   return form;
 }
 
+// Prepare the four answer fields used when adding a new question.
 function renderNewQuestionAnswerFields() {
   const answersContainer = document.getElementById("newQuestionAnswers");
 
@@ -396,6 +411,7 @@ function renderNewQuestionAnswerFields() {
   }
 }
 
+// Shared answer row builder for both new-question and edit-question forms.
 function createAnswerRow(answer, answerIndex, radioName, correctAnswerIndex) {
   const answerRow = document.createElement("div");
   answerRow.className = "input-group mb-2";
@@ -426,6 +442,7 @@ function createAnswerRow(answer, answerIndex, radioName, correctAnswerIndex) {
   return answerRow;
 }
 
+// Validate and append a new question to the current exam.
 function addQuestion() {
   const addQuestionForm = document.getElementById("addQuestionForm");
   const questionText = document.getElementById("newQuestionText").value.trim();
@@ -475,6 +492,7 @@ function saveQuestion(questionId, questionForm) {
   showMessage("Question saved successfully.", "success");
 }
 
+// Remove a question from the current exam after confirmation.
 function deleteQuestion(questionId) {
   const confirmed = window.confirm("Are you sure you want to delete this question?");
 
@@ -505,6 +523,7 @@ function getQuestionDataFromContainer(container, questionText) {
   };
 }
 
+// Replace the editor with a safe message when the exam cannot be managed.
 function showBlockedContent(title, message) {
   document.getElementById("examDetailsContent").hidden = true;
   document.getElementById("blockedContent").hidden = false;
@@ -512,6 +531,7 @@ function showBlockedContent(title, message) {
   document.getElementById("blockedMessage").textContent = message;
 }
 
+// Shared page-level success and error message helper.
 function showMessage(message, type) {
   const messageElement = document.getElementById("pageMessage");
   messageElement.textContent = message;

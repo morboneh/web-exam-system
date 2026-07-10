@@ -22,6 +22,7 @@
   </header>
 
   <main class="container py-5">
+    <!-- Shown when the exam is missing, deleted, or already completed. -->
     <section id="blockedContent" class="card" hidden>
       <div class="card-body">
         <h1 id="blockedTitle" class="h4">Exam unavailable</h1>
@@ -30,6 +31,7 @@
       </div>
     </section>
 
+    <!-- Active exam form populated from the selected exam. -->
     <section id="examContent" hidden>
       <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
         <div>
@@ -49,6 +51,7 @@
       </form>
     </section>
 
+    <!-- Result summary shown immediately after the exam is saved. -->
     <section id="resultContent" class="card" hidden aria-live="polite">
       <div class="card-body">
         <h1 class="h3">Exam Result</h1>
@@ -61,6 +64,7 @@
     </section>
   </main>
 
+  <!-- Confirms that leaving an active exam will submit the current answers. -->
   <dialog id="leaveDialog" class="exam-dialog" aria-labelledby="leaveDialogTitle">
     <h2 id="leaveDialogTitle" class="h4">Leave and submit exam?</h2>
     <p>Your current answers will be submitted and saved. You will not be able to take this exam again.</p>
@@ -70,6 +74,7 @@
     </div>
   </dialog>
 
+  <!-- Shown when the timer reaches zero and the result was saved automatically. -->
   <dialog id="timeUpDialog" class="exam-dialog" aria-labelledby="timeUpDialogTitle">
     <h2 id="timeUpDialogTitle" class="h4">Time is up</h2>
     <p>Your answers have been locked and your result has already been saved.</p>

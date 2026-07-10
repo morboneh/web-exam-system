@@ -2,16 +2,19 @@ import { Exam } from "../models/Exam.js";
 import { Question } from "../models/Question.js";
 import { StorageService } from "./StorageService.js";
 
+// Provides exam search, ownership filtering, and exam persistence operations.
 export class ExamService {
   constructor() {
     this.storageService = new StorageService();
   }
 
   getAllExams() {
+    // Load plain JSON objects first.
     const plainExams = this.storageService.getExams();
 
     // Stored JSON is plain data, so rebuild Exam and Question objects before using their methods.
     const allExamClones = plainExams.map(examData => {
+      // Rebuild the exam itself.
       const exam = new Exam(examData.title, {
         id: examData.id,
         description: examData.description,
@@ -22,6 +25,7 @@ export class ExamService {
         createdAt: examData.createdAt
       });
 
+      // Rebuild nested questions so Question methods are available again.
       exam.questions = (examData.questions ?? []).map(questionData => {
         return new Question(
           questionData.text,
@@ -41,6 +45,7 @@ export class ExamService {
     return this.getAllExams().filter(exam => exam.teacherId === teacherId);
   }
 
+  // Generated codes are short and student-facing, so confusing characters are skipped.
   generateUniqueExamCode() {
     // Avoid confusing characters like I, O, 0, and 1 in student-facing codes.
     const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -97,6 +102,7 @@ export class ExamService {
   }
 
   searchExamsByTitleOrCode(query) {
+    // Empty search means "show all exams" before page-level availability filters.
     const normalizedQuery = query.trim().toLowerCase();
 
     if (!normalizedQuery) {
@@ -111,6 +117,7 @@ export class ExamService {
     });
   }
 
+  // Allows editing an existing exam without treating its current code as a duplicate.
   isExamCodeAvailable(code, currentExamId = null) {
     const normalizedCode = code.trim().toUpperCase();
 

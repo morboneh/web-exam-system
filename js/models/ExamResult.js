@@ -1,3 +1,4 @@
+// Represents one completed exam attempt saved for a specific student and exam.
 export class ExamResult {
   constructor(examId, studentId, score, totalQuestions, correctAnswers, options = {}) {
     this.id = options.id ?? crypto.randomUUID();

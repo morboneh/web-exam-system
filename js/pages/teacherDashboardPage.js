@@ -8,10 +8,12 @@ const authService = new AuthService();
 const examService = new ExamService();
 const teacher = authService.requireRole(User.Roles.TEACHER);
 
+// Stop page setup if the visitor is not an authenticated teacher.
 if (teacher) {
   initializeDashboard(teacher);
 }
 
+// Connect dashboard controls, creation dialog, and the teacher's exam list.
 function initializeDashboard(currentTeacher) {
   const teacherNameElement = document.getElementById("teacherName");
   const logoutButton = document.getElementById("logoutButton");
@@ -24,11 +26,13 @@ function initializeDashboard(currentTeacher) {
 
   teacherNameElement.textContent = currentTeacher.fullName;
 
+  // Session actions
   logoutButton.addEventListener("click", () => {
     authService.logout();
     window.location.href = "index.html";
   });
 
+  // Create-exam dialog controls
   openCreateExamButton.addEventListener("click", () => {
     createExamDialog.showModal();
   });
@@ -42,19 +46,23 @@ function initializeDashboard(currentTeacher) {
 
   addQuestionButton.addEventListener("click", addQuestionFields);
 
+  // Validate and save the exam with the current teacher as owner.
   createExamForm.addEventListener("submit", event => {
     event.preventDefault();
 
+    // Read the exam information from the dialog.
     const title = document.getElementById("title").value.trim();
     const description = document.getElementById("description").value.trim();
     const category = document.getElementById("category").value.trim();
     const duration = Number(document.getElementById("duration").value);
 
+    // Basic exam fields are required before checking questions.
     if (!title || !description || !category || !Number.isFinite(duration) || duration <= 0) {
       showModalMessage("Please fill in the title, description, category, and a valid duration.");
       return;
     }
 
+    // Optional initial questions still need to be complete if they were added.
     const questions = getQuestionsFromForm();
 
     if (!questions) {
@@ -64,6 +72,7 @@ function initializeDashboard(currentTeacher) {
 
     const code = examService.generateUniqueExamCode();
 
+    // Create the exam with ownership tied to the logged-in teacher.
     const exam = new Exam(title, {
       description,
       category,
@@ -73,6 +82,7 @@ function initializeDashboard(currentTeacher) {
       questions
     });
 
+    // Save, reset the dialog, and refresh the dashboard list.
     examService.saveExam(exam);
     closeAndResetCreateExamDialog();
     showMessage(`Exam created successfully. Code: ${code}`, "success");
@@ -82,9 +92,12 @@ function initializeDashboard(currentTeacher) {
   renderExams(currentTeacher.id);
 }
 
+// Add one multiple-choice question block to the create-exam dialog.
 function addQuestionFields() {
   const questionFields = document.getElementById("questionFields");
   const questionNumber = questionFields.children.length + 1;
+
+  // Create the wrapper and heading for the new question.
   const questionBox = document.createElement("fieldset");
   questionBox.className = "question-box";
   questionBox.dataset.questionNumber = questionNumber;
@@ -107,6 +120,7 @@ function addQuestionFields() {
 
   questionBox.append(questionLabel, questionInput);
 
+  // Each question always has four answer options and one correct answer radio.
   for (let answerIndex = 0; answerIndex < 4; answerIndex += 1) {
     const answerRow = document.createElement("div");
     answerRow.className = "input-group mb-2";
@@ -138,6 +152,7 @@ function addQuestionFields() {
   document.getElementById("noQuestionsMessage").hidden = true;
 }
 
+// Read all question fields from the creation form and convert them to Question objects.
 function getQuestionsFromForm() {
   const questionBoxes = document.querySelectorAll("#questionFields .question-box");
   const questions = [];
@@ -157,6 +172,7 @@ function getQuestionsFromForm() {
   return questions;
 }
 
+// Reset the dialog so every new exam starts with a clean form.
 function closeAndResetCreateExamDialog() {
   const createExamDialog = document.getElementById("createExamDialog");
 
@@ -170,6 +186,7 @@ function closeAndResetCreateExamDialog() {
   }
 }
 
+// Render only exams owned by the current teacher.
 function renderExams(teacherId) {
   const examList = document.getElementById("examList");
   const exams = examService.getExamsByTeacherId(teacherId);
@@ -189,7 +206,9 @@ function renderExams(teacherId) {
   });
 }
 
+// Build a dashboard card with navigation to details and a delete action.
 function createExamCard(exam, teacherId) {
+  // Card shell
   const column = document.createElement("div");
   column.className = "col-md-6 col-lg-4";
 
@@ -199,6 +218,7 @@ function createExamCard(exam, teacherId) {
   const cardBody = document.createElement("div");
   cardBody.className = "card-body d-flex flex-column";
 
+  // Exam information shown on the dashboard.
   const title = document.createElement("h3");
   title.className = "h5 card-title";
   title.textContent = exam.title;
@@ -218,6 +238,7 @@ function createExamCard(exam, teacherId) {
   const actions = document.createElement("div");
   actions.className = "d-flex gap-2 mt-auto";
 
+  // Teacher actions for opening details or deleting this exam.
   const detailsLink = document.createElement("a");
   detailsLink.className = "btn btn-outline-primary btn-sm";
   detailsLink.href = `exam-details.html?id=${encodeURIComponent(exam.id)}`;
@@ -249,6 +270,7 @@ function createExamCard(exam, teacherId) {
   return column;
 }
 
+// Display feedback below the dashboard heading.
 function showMessage(message, type) {
   const messageElement = document.getElementById("dashboardMessage");
   messageElement.textContent = message;

@@ -1,3 +1,4 @@
+// Represents one multiple-choice question and its correct answer.
 export class Question {
   constructor(text, answers, correctAnswerIndex, options = {}) {
     this.id = options.id ?? crypto.randomUUID();

@@ -8,10 +8,12 @@ const examService = new ExamService();
 const resultService = new ResultService();
 const student = authService.requireRole(User.Roles.STUDENT);
 
+// Stop page setup if the visitor is not an authenticated student.
 if (student) {
   initializeStudentDashboard(student);
 }
 
+// Connect dashboard session controls and load this student's saved results.
 function initializeStudentDashboard(currentStudent) {
   const studentNameElement = document.getElementById("studentName");
   const logoutButton = document.getElementById("logoutButton");
@@ -27,6 +29,7 @@ function initializeStudentDashboard(currentStudent) {
 
 // Load only this student's saved exam results and show the newest submissions first.
 function renderStudentResults(studentId) {
+  // Load only this student, then sort for a newest-first history.
   const results = resultService
     .getResultsByStudentId(studentId)
     .slice()
@@ -34,10 +37,12 @@ function renderStudentResults(studentId) {
       return new Date(secondResult.submittedAt) - new Date(firstResult.submittedAt);
     });
 
+  // The same result list feeds both the summary and history sections.
   renderResultsSummary(results);
   renderResultsHistory(results);
 }
 
+// Calculate the summary numbers shown above the result history.
 function renderResultsSummary(results) {
   const completedExamCount = document.getElementById("completedExamCount");
   const averageScore = document.getElementById("averageScore");
@@ -46,6 +51,7 @@ function renderResultsSummary(results) {
 
   completedExamCount.textContent = results.length;
 
+  // Empty dashboard starts at zero until the student submits an exam.
   if (results.length === 0) {
     averageScore.textContent = "0%";
     highestScore.textContent = "0%";
@@ -53,6 +59,7 @@ function renderResultsSummary(results) {
     return;
   }
 
+  // Calculate aggregate numbers from the saved percentage scores.
   const scores = results.map(result => Number(result.score) || 0);
   const totalScore = scores.reduce((sum, score) => sum + score, 0);
   const roundedAverage = Math.round(totalScore / scores.length);
@@ -63,13 +70,16 @@ function renderResultsSummary(results) {
   summaryMessage.textContent = "";
 }
 
+// Render the completed-exam cards or the friendly empty state.
 function renderResultsHistory(results) {
   const resultsHistory = document.getElementById("resultsHistory");
   const historyCount = document.getElementById("historyCount");
 
+  // Refresh the section each time the dashboard loads.
   resultsHistory.replaceChildren();
   historyCount.textContent = `${results.length} result${results.length === 1 ? "" : "s"}`;
 
+  // Friendly state before the first completed exam.
   if (results.length === 0) {
     const emptyState = document.createElement("p");
     emptyState.className = "text-secondary";
@@ -83,9 +93,12 @@ function renderResultsHistory(results) {
   });
 }
 
+// Build one completed-exam card from a saved result.
 function createResultCard(result) {
+  // The exam might have been deleted after the result was saved.
   const exam = examService.getExamById(result.examId);
 
+  // Card shell
   const column = document.createElement("div");
   column.className = "col-md-6 col-lg-4";
 
@@ -95,6 +108,7 @@ function createResultCard(result) {
   const cardBody = document.createElement("div");
   cardBody.className = "card-body";
 
+  // Exam details and score summary.
   const title = document.createElement("h3");
   title.className = "h5 card-title";
   title.textContent = exam?.title ?? "Deleted or unavailable exam";
@@ -124,6 +138,7 @@ function createResultCard(result) {
   return column;
 }
 
+// Keep date formatting consistent across result history cards.
 function formatSubmissionDate(submittedAt) {
   const date = new Date(submittedAt);
 

@@ -10,10 +10,12 @@ const messageElement = document.getElementById("registerMessage");
 
 const currentUser = authService.getCurrentUser();
 
+// Registered users should not create another account during an active session.
 if (currentUser) {
   authService.redirectByRole(currentUser);
 }
 
+// Create a new teacher or student account and store it in localStorage.
 registerForm.addEventListener("submit", event => {
   event.preventDefault();
 
@@ -49,6 +51,7 @@ registerForm.addEventListener("submit", event => {
   }, 800);
 });
 
+// Keep role validation in one place so only supported roles are saved.
 function isValidRole(role) {
   return role === User.Roles.TEACHER || role === User.Roles.STUDENT;
 }

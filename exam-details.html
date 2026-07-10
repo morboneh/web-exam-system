@@ -24,6 +24,7 @@
   <main class="container py-5">
     <div id="pageMessage" class="form-message mb-3" aria-live="polite"></div>
 
+    <!-- Main teacher editor; JavaScript reveals this only after ownership is verified. -->
     <section id="examDetailsContent" hidden>
       <div class="mb-4">
         <h1>Exam Details</h1>
@@ -89,6 +90,7 @@
         </div>
       </form>
 
+      <!-- Hidden until the teacher opens question management. -->
       <div id="questionManagementArea" hidden>
         <section class="card mb-4" aria-labelledby="questions-heading">
           <div class="card-body">
@@ -121,6 +123,7 @@
         </section>
       </div>
 
+      <!-- Hidden until the teacher requests the submitted student results. -->
       <section id="studentResultsSection" class="card" aria-labelledby="student-results-heading" hidden>
         <div class="card-body">
           <h2 id="student-results-heading" class="h4 mb-3">Student Results</h2>
@@ -129,6 +132,7 @@
       </section>
     </section>
 
+    <!-- Safe message area for missing exams or exams owned by another teacher. -->
     <section id="blockedContent" class="card" hidden>
       <div class="card-body">
         <h1 id="blockedTitle" class="h4">Exam unavailable</h1>
