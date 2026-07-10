@@ -71,6 +71,119 @@ The project is organized into small modules:
 
 This keeps data structure, storage logic, and page behavior separated while still staying simple enough for a client-side course project.
 
+## OOP Diagram
+
+```mermaid
+classDiagram
+  class User {
+    +Roles
+    +id
+    +fullName
+    +email
+    +password
+    +role
+  }
+
+  class Exam {
+    +id
+    +title
+    +description
+    +category
+    +code
+    +duration
+    +teacherId
+    +questions
+    +createdAt
+    +addQuestion(question)
+    +getQuestionCount()
+  }
+
+  class Question {
+    +id
+    +text
+    +answers
+    +correctAnswerIndex
+    +isCorrect(userAnswerIndex)
+  }
+
+  class ExamResult {
+    +id
+    +examId
+    +studentId
+    +score
+    +totalQuestions
+    +correctAnswers
+    +submittedAt
+    +wrongQuestionIndexes
+    +unansweredQuestionIndexes
+    +selectedAnswerIndexes
+    +submittedBy
+  }
+
+  class StorageService {
+    +keys
+    +getJson(key, defaultValue)
+    +saveJson(key, value)
+    +getUsers()
+    +saveUsers(users)
+    +addUser(user)
+    +findUserByEmail(email)
+    +findUserByCredentials(email, password)
+    +getExams()
+    +saveExams(exams)
+    +getResults()
+    +saveResults(results)
+    +getCurrentUser()
+    +setCurrentUser(user)
+    +clearCurrentUser()
+  }
+
+  class AuthService {
+    +storageService
+    +login(email, password)
+    +logout()
+    +getCurrentUser()
+    +isLoggedIn()
+    +redirectByRole(user)
+    +requireAuth()
+    +requireRole(role)
+  }
+
+  class ExamService {
+    +storageService
+    +getAllExams()
+    +getExamsByTeacherId(teacherId)
+    +generateUniqueExamCode()
+    +saveExam(exam)
+    +updateExam(updatedExam)
+    +deleteExam(examId)
+    +getExamById(examId)
+    +searchExamsByTitleOrCode(query)
+    +isExamCodeAvailable(code, currentExamId)
+  }
+
+  class ResultService {
+    +storageService
+    +addResult(result)
+    +hasStudentCompletedExam(studentId, examId)
+    +getResultsByStudentId(studentId)
+    +getResultsByExamId(examId)
+  }
+
+  Exam "1" *-- "0..*" Question : contains
+  User "1" --> "0..*" Exam : teacherId stores teacher User.id
+  User "1" --> "0..*" ExamResult : studentId stores student User.id
+  Exam "1" --> "0..*" ExamResult : examId stores Exam.id
+  AuthService ..> StorageService : uses
+  ExamService ..> StorageService : uses
+  ResultService ..> StorageService : uses
+  AuthService ..> User : checks roles
+  ExamService ..> Exam : rebuilds
+  ExamService ..> Question : rebuilds
+```
+
+Models represent the system's data entities. Services manage authentication, exams, results, and persistence. Page modules connect the services to the DOM and are therefore not shown as OOP classes.
+
 ## Data Persistence
 
 The application stores data in `localStorage` as JSON.
