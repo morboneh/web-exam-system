@@ -2,6 +2,12 @@
 
 A client-side web application for creating, taking, and reviewing exams. The project was built as a web development student project and uses browser storage instead of a backend server or database.
 
+## Project Information
+
+- **Student:** Mor Boneh
+- **GitHub Repository:** [View the source code on GitHub](https://github.com/morboneh/web-exam-system)
+- **Live Website:** [Open the live application](https://morboneh.github.io/web-exam-system/)
+
 ## Technologies
 
 - HTML
@@ -57,7 +63,6 @@ This project has no backend, server, or external database. All data is saved in 
 - `js/models/` - data classes such as `User`, `Exam`, `Question`, and `ExamResult`.
 - `js/services/` - business logic and localStorage access.
 - `js/pages/` - page-specific scripts that connect HTML, services, and DOM events.
-- `js/ui/` - original UI helper code kept from the classroom version where relevant.
 
 ## Architecture
 
@@ -70,6 +75,20 @@ The project is organized into small modules:
 - **AuthService** handles login, logout, session checks, and role-based redirects.
 
 This keeps data structure, storage logic, and page behavior separated while still staying simple enough for a client-side course project.
+
+## Main System Flows
+
+**Teacher Flow**
+
+Home -> Register/Login -> Teacher Dashboard -> Create Exam -> Exam Details -> Manage Questions -> View Student Results
+
+**Student Flow**
+
+Home -> Register/Login -> Student Dashboard -> Search Exam -> Take Exam -> Submit Exam -> View Results History
+
+## Navigation
+
+Authenticated users are redirected according to their role. Teachers navigate from the Teacher Dashboard to `exam-details.html?id=...` to manage a specific exam. Students navigate from the Student Dashboard to Search Exam, then to `take-exam.html?id=...` to take a specific exam. Query strings are used to identify which exam should be opened on the details and taking pages.
 
 ## OOP Diagram
 
@@ -196,6 +215,56 @@ Stored data includes:
 - `currentUser`
 
 Because the data is stored only in the browser, clearing browser storage will remove the saved users, exams, sessions, and results.
+
+## Stored JSON Structure
+
+The main objects are saved as JSON-compatible data in `localStorage`.
+
+**User**
+
+```json
+{
+  "id": "user-id",
+  "fullName": "Student Name",
+  "email": "student@example.com",
+  "role": "student"
+}
+```
+
+**Exam**
+
+```json
+{
+  "id": "exam-id",
+  "title": "JavaScript Basics",
+  "code": "ABC234",
+  "teacherId": "teacher-user-id",
+  "questions": []
+}
+```
+
+**ExamResult**
+
+```json
+{
+  "id": "result-id",
+  "examId": "exam-id",
+  "studentId": "student-user-id",
+  "score": 90,
+  "submittedAt": "2026-07-10T10:00:00.000Z"
+}
+```
+
+**currentUser**
+
+```json
+{
+  "id": "user-id",
+  "fullName": "Teacher Name",
+  "email": "teacher@example.com",
+  "role": "teacher"
+}
+```
 
 ## Optional Features Included
 
