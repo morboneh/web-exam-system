@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exam Details | Exam Management Web App</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="border-bottom bg-white">
+    <nav class="container d-flex align-items-center justify-content-between py-3" aria-label="Exam details navigation">
+      <a class="text-decoration-none fw-bold" href="teacher-dashboard.html">Exam Management</a>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="teacher-dashboard.html">Teacher Dashboard</a>
+        <button id="logoutButton" class="btn btn-outline-danger" type="button">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container py-5">
+    <div id="pageMessage" class="form-message mb-3" aria-live="polite"></div>
+
+    <!-- Main teacher editor; JavaScript reveals this only after ownership is verified. -->
+    <section id="examDetailsContent" hidden>
+      <div class="mb-4">
+        <h1>Exam Details</h1>
+        <p class="text-secondary mb-0">Edit exam information and manage its questions.</p>
+      </div>
+
+      <section class="card mb-4" aria-labelledby="exam-info-heading">
+        <div class="card-body">
+          <div class="d-flex flex-column flex-md-row align-items-md-start justify-content-between gap-3 mb-3">
+            <div>
+              <h2 id="exam-info-heading" class="h4 mb-1">Exam Information</h2>
+              <p class="text-secondary mb-0">Review the current exam setup.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <button id="toggleExamInfoFormButton" class="btn btn-outline-primary" type="button">Edit Exam Details</button>
+              <button id="toggleQuestionsButton" class="btn btn-outline-primary" type="button">Manage Questions</button>
+              <button id="toggleResultsButton" class="btn btn-outline-primary" type="button">View Student Results</button>
+              <button id="deleteExamButton" class="btn btn-outline-danger" type="button">Delete Exam</button>
+            </div>
+          </div>
+
+          <dl id="examInfoSummary" class="row mb-0"></dl>
+        </div>
+      </section>
+
+      <form id="examInfoForm" class="card mb-4" hidden>
+        <div class="card-body">
+          <h2 class="h4 mb-3">Exam Information</h2>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="examId" class="form-label">Exam ID</label>
+              <input id="examId" class="form-control" type="text" readonly>
+            </div>
+
+            <div class="col-md-6">
+              <label for="examCode" class="form-label">Exam Code</label>
+              <input id="examCode" class="form-control" type="text" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="title" class="form-label">Title</label>
+              <input id="title" class="form-control" type="text" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="category" class="form-label">Category</label>
+              <input id="category" class="form-control" type="text" required>
+            </div>
+
+            <div class="col-12">
+              <label for="description" class="form-label">Description</label>
+              <textarea id="description" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <div class="col-md-6">
+              <label for="duration" class="form-label">Duration (minutes)</label>
+              <input id="duration" class="form-control" type="number" min="1" required>
+            </div>
+          </div>
+
+          <button class="btn btn-primary mt-4" type="submit">Save Exam Information</button>
+        </div>
+      </form>
+
+      <!-- Hidden until the teacher opens question management. -->
+      <div id="questionManagementArea" hidden>
+        <section class="card mb-4" aria-labelledby="questions-heading">
+          <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+              <div>
+                <h2 id="questions-heading" class="h4 mb-1">Questions</h2>
+                <p id="questionCount" class="text-secondary mb-0"></p>
+              </div>
+            </div>
+
+            <div id="questionsList"></div>
+          </div>
+        </section>
+
+        <section class="card mb-4" aria-labelledby="add-question-heading">
+          <div class="card-body">
+            <h2 id="add-question-heading" class="h4 mb-3">Add Question</h2>
+
+            <form id="addQuestionForm">
+              <div class="mb-3">
+                <label for="newQuestionText" class="form-label">Question text</label>
+                <input id="newQuestionText" class="form-control" type="text" required>
+              </div>
+
+              <div id="newQuestionAnswers" class="mb-3"></div>
+
+              <button class="btn btn-primary" type="submit">Add Question</button>
+            </form>
+          </div>
+        </section>
+      </div>
+
+      <!-- Hidden until the teacher requests the submitted student results. -->
+      <section id="studentResultsSection" class="card" aria-labelledby="student-results-heading" hidden>
+        <div class="card-body">
+          <h2 id="student-results-heading" class="h4 mb-3">Student Results</h2>
+          <div id="studentResultsList"></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- Safe message area for missing exams or exams owned by another teacher. -->
+    <section id="blockedContent" class="card" hidden>
+      <div class="card-body">
+        <h1 id="blockedTitle" class="h4">Exam unavailable</h1>
+        <p id="blockedMessage" class="text-secondary"></p>
+        <a class="btn btn-primary" href="teacher-dashboard.html">Back to Teacher Dashboard</a>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="js/pages/examDetailsPage.js"></script>
+</body>
+</html>
