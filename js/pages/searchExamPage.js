@@ -41,7 +41,10 @@ function renderSearchResults(query, currentStudent) {
   const searchResults = document.getElementById("searchResults");
   const searchMessage = document.getElementById("searchMessage");
   const resultsCount = document.getElementById("resultsCount");
-  const exams = examService.searchExamsByTitleOrCode(query);
+  const exams = examService.searchExamsByTitleOrCode(query).filter(exam =>
+    exam.getQuestionCount() > 0 &&
+    !resultService.hasStudentCompletedExam(currentStudent.id, exam.id)
+  );
   const normalizedQuery = query.trim();
 
   searchResults.replaceChildren();
@@ -58,11 +61,11 @@ function renderSearchResults(query, currentStudent) {
   }
 
   exams.forEach(exam => {
-    searchResults.append(createExamResultCard(exam, currentStudent));
+    searchResults.append(createExamResultCard(exam));
   });
 }
 
-function createExamResultCard(exam, currentStudent) {
+function createExamResultCard(exam) {
   const column = document.createElement("div");
   column.className = "col-md-6 col-lg-4";
 
@@ -88,37 +91,12 @@ function createExamResultCard(exam, currentStudent) {
   questionCount.className = "small text-secondary";
   questionCount.textContent = `Questions: ${exam.getQuestionCount()}`;
 
-  const isCompleted = resultService.hasStudentCompletedExam(currentStudent.id, exam.id);
-  const hasQuestions = exam.getQuestionCount() > 0;
-  // Keep empty exams visible, but do not let students start an exam that has nothing to answer.
-  const openLink = isCompleted || !hasQuestions
-    ? document.createElement("button")
-    : document.createElement("a");
-  openLink.className = `btn btn-sm mt-auto ${isCompleted || !hasQuestions ? "btn-secondary" : "btn-primary"}`;
+  const openLink = document.createElement("a");
+  openLink.className = "btn btn-sm mt-auto btn-primary";
+  openLink.textContent = "Start Exam";
+  openLink.href = `take-exam.html?id=${encodeURIComponent(exam.id)}`;
 
-  if (isCompleted) {
-    openLink.type = "button";
-    openLink.disabled = true;
-    openLink.textContent = "Completed";
-  } else if (!hasQuestions) {
-    openLink.type = "button";
-    openLink.disabled = true;
-    openLink.textContent = "Not Available Yet";
-  } else {
-    openLink.textContent = "Start Exam";
-    openLink.href = `take-exam.html?id=${encodeURIComponent(exam.id)}`;
-  }
-
-  const cardElements = [title, description, details, questionCount];
-
-  if (!hasQuestions) {
-    const availabilityMessage = document.createElement("p");
-    availabilityMessage.className = "small text-secondary";
-    availabilityMessage.textContent = "This exam is not available yet because it has no questions.";
-    cardElements.push(availabilityMessage);
-  }
-
-  cardBody.append(...cardElements, openLink);
+  cardBody.append(title, description, details, questionCount, openLink);
   card.append(cardBody);
   column.append(card);
 
