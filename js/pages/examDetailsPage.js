@@ -93,7 +93,10 @@ function initializeExamDetailsPage(currentTeacher) {
 
 // Copy the current exam data into the edit form.
 function fillExamInformationForm() {
-  document.getElementById("examId").value = currentExam.id;
+  const examIdInput = document.getElementById("examId");
+
+  examIdInput.value = currentExam.id;
+  examIdInput.readOnly = true;
   document.getElementById("title").value = currentExam.title;
   document.getElementById("description").value = currentExam.description;
   document.getElementById("category").value = currentExam.category;
@@ -133,6 +136,7 @@ function renderExamInformationSummary() {
 
 // Validate and persist changes to the exam's general information.
 function saveExamInformation() {
+  const originalExamId = currentExam.id;
   const title = document.getElementById("title").value.trim();
   const description = document.getElementById("description").value.trim();
   const category = document.getElementById("category").value.trim();
@@ -154,6 +158,7 @@ function saveExamInformation() {
   currentExam.category = category;
   currentExam.code = code;
   currentExam.duration = duration;
+  currentExam.id = originalExamId;
 
   if (!examService.updateExam(currentExam)) {
     showMessage("Could not save the exam because it no longer exists.", "error");
