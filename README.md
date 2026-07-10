@@ -108,7 +108,7 @@ Because the data is stored only in the browser, clearing browser storage will re
 10. View the result on the student dashboard.
 11. Log back in as the teacher.
 12. Open the exam details page and view student results.
-13. Test that an exam with zero questions is visible but cannot be started.
+13. Test that an exam with zero questions does not appear in the student's available exam search results.
 14. Test protected pages and role redirects:
     - Logged-out users should be redirected to login.
     - Students should not access teacher pages.
